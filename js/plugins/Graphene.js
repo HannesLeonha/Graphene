@@ -34,19 +34,20 @@
  *   ...
  *   "build": <build command>,
  *   "game": "nw ../",
- *   "game-ui": "npm run build && npm run game"
+ *   "game-ui": "npm run build && npm run game",
+ *   "dev-game-ui": "concurrently \"npm run dev\" \"npm run game\""
  * },
  * 
  * This makes it so you can run the game with `npm run game` and you can
  * run the game with the updated ui using `npm run game-ui`.
  * 
- * You can also change the plugin into live development mode and add the
- * following script to the before mentioned package.json (you need to
- * install concurrently with `npm install concurrently` for this):
- * "dev-game-ui": "concurrently \"npm run dev\" \"npm run game\""
+ * And when you have installed the npm package concurrently (`npm install
+ * concurrently`) you can also run the plugin in live development mode with
+ * `npm run dev-game-ui`.
  *
- * When the ui tries to access the game via `window.top.` you need to add
- * the following line to the package.json of the RPG Maker project:
+ * When the ui tries to access the game via `window.top.` in live development
+ * mode you need to add the following line to the package.json of the RPG Maker
+ * project:
  *   "node-remote":"http://localhost",
  *
  * Be aware that this flag gets removed every time you save the project in
@@ -106,7 +107,7 @@
  * exclude the development ui folder in the RPG Maker deployment window.
  * 
  * --------------------------------- Updates ---------------------------------
- * 
+ *
  * V1.0 - Added basic functionality
  * 
  * @param uiPath
