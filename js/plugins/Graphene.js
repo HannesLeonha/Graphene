@@ -334,10 +334,6 @@
         SceneManager.goto(Scene_Blank);
     };
 
-    Scene_Battle.prototype.start = function() {
-        SceneManager.goto(Scene_Blank);
-    };
-
     Game_Interpreter.prototype.command302 = function(params) {
         if (!$gameParty.inBattle()) {
             this.nextEventCode()
