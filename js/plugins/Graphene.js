@@ -251,8 +251,6 @@
 
     // Make pointer events pass through non ui elements
     uiFrame.onload = function () {
-        const uiFrameDocument = uiFrame.contentDocument;
-
         document.addEventListener("mousemove", updateIframePointerEvents, true);
         uiFrame.contentDocument.addEventListener("mousemove", updateIframePointerEvents, true);
 
@@ -332,7 +330,7 @@
         SceneManager.goto(Scene_Blank);
     };
 
-    Game_Interpreter.prototype.command302 = function(params) {
+    Game_Interpreter.prototype.command302 = function() {
         if (!$gameParty.inBattle()) {
             this.nextEventCode()
             SceneManager.push(Scene_Blank);
