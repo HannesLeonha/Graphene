@@ -269,7 +269,7 @@
             }
     
             const el = uiFrame.contentDocument.elementFromPoint(mouseCoordinate.x, mouseCoordinate.y);
-            uiFrame.style.pointerEvents = !el || el === uiFrame.contentDocument.body ? "none" : "auto";
+            uiFrame.style.pointerEvents = !el || el === uiFrame.contentDocument.documentElement ? "none" : "auto";
         }
 
         // Can be adjusted according to later 
@@ -326,8 +326,6 @@
             uiFrame.contentWindow.postMessage(eventObject);
         }
     });
-
-    // TODO: Fix input capture when clicking on ui
 
     // Rip out the ui
     Scene_Splash.prototype.gotoTitle = function() {
