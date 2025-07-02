@@ -1,4 +1,4 @@
-<h1 align="center">Graphene</h1>
+<img src="https://github.com/HannesLeonha/Graphene/blob/master/docs/assets/hero.png?raw=true" alt="4 Screenshots of the example ui with graphene written in the center"/>
 Removes the built in UI of RPG Maker Mz and replaces it with a custom web ui which can use npm.
 
 ## Examples
