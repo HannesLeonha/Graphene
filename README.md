@@ -6,15 +6,15 @@ If you're not sure about how to start or how to implement something take a look 
 
 ## Usage
 1. Creating the web ui
-Create folder with your web project in the root of the RPG-Maker Projectfolder. It's recommended that you create an npm-project with a build toollike vite and a web framework like react.
+Create folder with your web project in the root of the RPG-Maker Project folder. It's recommended that you create an npm-project with a build toollike vite and a web framework like react.
 
 2. Efficient debugging
 
 <ol start="2"><li>1. SDK Version of NWJS</li></ol>
-It's highly recommended that you install the sdk version of nwjs from theinternet. Using the command `path/to/nwjs/nw.exe .` in the project rootfolder the RPG Maker project will start. By pressing F12 you can now see adeveloper console.
+It's highly recommended that you install the sdk version of nwjs from the internet. Using the command `path/to/nwjs/nw.exe .` in the project rootfolder the RPG Maker project will start. By pressing F12 you can now see adeveloper console.
 
 <ol start="2"><li>2. Running with npm</li></ol>
-Another quality of life improvement you can add if you use npm are thesescripts which you can add to the package.json file:
+Another quality of life improvement you can add if you use npm are these scripts which you can add to the package.json file:
 ```
 "scripts": {
   ...

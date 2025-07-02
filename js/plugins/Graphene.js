@@ -105,6 +105,13 @@
  * You should make sure that the built ui is placed outside of the npm
  * project. When you have ensured that everything still works you need to
  * exclude the development ui folder in the RPG Maker deployment window.
+ *
+ * 6. Pitfalls
+ *
+ * 6.1 React Router
+ * When building with React Router you need to use the HashRouter because it
+ * will think that the iframe path of /path/to/ui/index.html is the current
+ * route.
  * 
  * --------------------------------- Updates ---------------------------------
  *
@@ -230,121 +237,164 @@
         uiFrame.style.border = "none";
         uiFrame.style.background = "none transparent";
     };
-
-    // Fix video element
-    const _createElement = Video._createElement;
-    Video._createElement = function() {
-        _createElement.apply(this, arguments);
-
-        this._element.style.zIndex = 3;
-        Video._updateVisibility(false);
-    };
-
-    const _updateVisibility = Video._updateVisibility;
-    Video._updateVisibility = function() {
-        _updateVisibility.apply(this, arguments);
-
-        this._element.style.pointerEvents = Video._isVisible() ? "all" : "none";
-        uiFrame.style.opacity = Video._isVisible() ? "0" : "1";
-    };
     
 
     // Make pointer events pass through non ui elements
-    uiFrame.onload = function () {
-        document.addEventListener("mousemove", updateIframePointerEvents, true);
-        uiFrame.contentDocument.addEventListener("mousemove", updateIframePointerEvents, true);
+    {
+        uiFrame.onload = function () {
+            document.addEventListener("mousemove", updateIframePointerEvents, true);
+            uiFrame.contentDocument.addEventListener("mousemove", updateIframePointerEvents, true);
 
-        function updateIframePointerEvents(e) {
-            let mouseCoordinate;
-    
-            if (e.currentTarget === document) {
-                mouseCoordinate = {
-                    x: e.pageX - uiFrame.offsetLeft,
-                    y: e.pageY - uiFrame.offsetTop,
-                };
-            } else {
-                mouseCoordinate = { x: e.clientX, y: e.clientY };
+            function updateIframePointerEvents(e) {
+                let mouseCoordinate;
+
+                if (e.currentTarget === document) {
+                    mouseCoordinate = {
+                        x: e.pageX - uiFrame.offsetLeft,
+                        y: e.pageY - uiFrame.offsetTop,
+                    };
+                } else {
+                    mouseCoordinate = {x: e.clientX, y: e.clientY};
+                }
+
+                const el = uiFrame.contentDocument.elementFromPoint(mouseCoordinate.x, mouseCoordinate.y);
+                uiFrame.style.pointerEvents = !el || el === uiFrame.contentDocument.documentElement ? "none" : "auto";
             }
-    
-            const el = uiFrame.contentDocument.elementFromPoint(mouseCoordinate.x, mouseCoordinate.y);
-            uiFrame.style.pointerEvents = !el || el === uiFrame.contentDocument.documentElement ? "none" : "auto";
-        }
 
-        // Can be adjusted according to later 
-        const pf = { passive: false };
-        // uiFrame.contentDocument.addEventListener("mousedown", TouchInput._onMouseDown.bind(TouchInput));
-        uiFrame.contentDocument.addEventListener("mousemove", TouchInput._onMouseMove.bind(TouchInput));
-        uiFrame.contentDocument.addEventListener("mouseup", TouchInput._onMouseUp.bind(TouchInput));
-        uiFrame.contentDocument.addEventListener("wheel", TouchInput._onWheel.bind(TouchInput), pf);
-        // uiFrame.contentDocument.addEventListener("touchstart", TouchInput._onTouchStart.bind(TouchInput), pf);
-        uiFrame.contentDocument.addEventListener("touchmove", TouchInput._onTouchMove.bind(TouchInput), pf);
-        uiFrame.contentDocument.addEventListener("touchend", TouchInput._onTouchEnd.bind(TouchInput));
-        uiFrame.contentDocument.addEventListener("touchcancel", TouchInput._onTouchCancel.bind(TouchInput));
-        uiFrame.contentDocument.addEventListener("keydown", SceneManager.onKeyDown.bind(SceneManager));
-        uiFrame.contentDocument.addEventListener("keydown", Graphics._onKeyDown.bind(Graphics));
-        uiFrame.contentDocument.addEventListener("keydown", WebAudio._onUserGesture.bind(WebAudio));
-        uiFrame.contentDocument.addEventListener("mousedown", WebAudio._onUserGesture.bind(WebAudio));
-        uiFrame.contentDocument.addEventListener("touchend", WebAudio._onUserGesture.bind(WebAudio));
-        uiFrame.contentDocument.addEventListener("keydown", Video._onUserGesture.bind(Video));
-        uiFrame.contentDocument.addEventListener("mousedown", Video._onUserGesture.bind(Video));
-        uiFrame.contentDocument.addEventListener("touchend", Video._onUserGesture.bind(Video));
-        uiFrame.contentDocument.addEventListener("keydown", Input._onKeyDown.bind(Input));
-        uiFrame.contentDocument.addEventListener("keyup", Input._onKeyUp.bind(Input));
-    };
-
-    // Add blur to error screen
-    const _applyCanvasFilter = Graphics._applyCanvasFilter;
-    Graphics._applyCanvasFilter = function() {
-        _applyCanvasFilter.apply(this, arguments);
-
-        uiFrame.style.opacity = 0.3;
-        uiFrame.style.filter = "blur(8px)";
-        uiFrame.style.webkitFilter = "blur(8px)";
-    };
-
-    const _clearCanvasFilter = Graphics._clearCanvasFilter;
-    Graphics._clearCanvasFilter = function() {
-        _clearCanvasFilter.apply(this, arguments);
-
-        uiFrame.style.opacity = 1;
-        uiFrame.style.filter = "";
-        uiFrame.style.webkitFilter = "";
-    };
-
-    // Event system for messages to the ui
-    PluginManager.registerCommand(pluginName, "SendEvent", args => {
-        const eventObject = {
-            name: args.eventName,
-            arguments: args.arguments
+            // Can be adjusted according to later
+            const pf = {passive: false};
+            // uiFrame.contentDocument.addEventListener("mousedown", TouchInput._onMouseDown.bind(TouchInput));
+            uiFrame.contentDocument.addEventListener("mousemove", TouchInput._onMouseMove.bind(TouchInput));
+            uiFrame.contentDocument.addEventListener("mouseup", TouchInput._onMouseUp.bind(TouchInput));
+            uiFrame.contentDocument.addEventListener("wheel", TouchInput._onWheel.bind(TouchInput), pf);
+            // uiFrame.contentDocument.addEventListener("touchstart", TouchInput._onTouchStart.bind(TouchInput), pf);
+            uiFrame.contentDocument.addEventListener("touchmove", TouchInput._onTouchMove.bind(TouchInput), pf);
+            uiFrame.contentDocument.addEventListener("touchend", TouchInput._onTouchEnd.bind(TouchInput));
+            uiFrame.contentDocument.addEventListener("touchcancel", TouchInput._onTouchCancel.bind(TouchInput));
+            uiFrame.contentDocument.addEventListener("keydown", SceneManager.onKeyDown.bind(SceneManager));
+            uiFrame.contentDocument.addEventListener("keydown", Graphics._onKeyDown.bind(Graphics));
+            uiFrame.contentDocument.addEventListener("keydown", WebAudio._onUserGesture.bind(WebAudio));
+            uiFrame.contentDocument.addEventListener("mousedown", WebAudio._onUserGesture.bind(WebAudio));
+            uiFrame.contentDocument.addEventListener("touchend", WebAudio._onUserGesture.bind(WebAudio));
+            uiFrame.contentDocument.addEventListener("keydown", Video._onUserGesture.bind(Video));
+            uiFrame.contentDocument.addEventListener("mousedown", Video._onUserGesture.bind(Video));
+            uiFrame.contentDocument.addEventListener("touchend", Video._onUserGesture.bind(Video));
+            uiFrame.contentDocument.addEventListener("keydown", Input._onKeyDown.bind(Input));
+            uiFrame.contentDocument.addEventListener("keyup", Input._onKeyUp.bind(Input));
         };
-
-        if(parameters.liveDevelopment === "true") {
-            uiFrame.contentWindow.postMessage(eventObject, parameters.address);
-        } else {
-            uiFrame.contentWindow.postMessage(eventObject);
-        }
-    });
-
-    // Rip out the ui
-    Scene_Splash.prototype.gotoTitle = function() {
-        SceneManager.goto(Scene_Blank);
-    };
-
-    Game_Interpreter.prototype.command302 = function() {
-        if (!$gameParty.inBattle()) {
-            this.nextEventCode()
-            SceneManager.push(Scene_Blank);
-        }
-        return true;
-    };
-
-    Scene_Map.prototype.isMenuEnabled = (() => false);
-
-    // Blank scene
-    function Scene_Blank() {
-        this.initialize(...arguments);
     }
 
-    Scene_Blank.prototype = Object.create(Scene_Base.prototype);
-    Scene_Blank.prototype.constructor = Scene_Blank;
+    // Fix RPG-Maker elements
+    {
+        // Fix video element
+        const _createElement = Video._createElement;
+        Video._createElement = function () {
+            _createElement.apply(this, arguments);
+
+            this._element.style.zIndex = 3;
+            Video._updateVisibility(false);
+        };
+
+        const _updateVisibility = Video._updateVisibility;
+        Video._updateVisibility = function () {
+            _updateVisibility.apply(this, arguments);
+
+            this._element.style.pointerEvents = Video._isVisible() ? "all" : "none";
+            uiFrame.style.opacity = Video._isVisible() ? "0" : "1";
+        };
+
+        // Add blur to error screen
+        const _applyCanvasFilter = Graphics._applyCanvasFilter;
+        Graphics._applyCanvasFilter = function () {
+            _applyCanvasFilter.apply(this, arguments);
+
+            uiFrame.style.opacity = 0.3;
+            uiFrame.style.filter = "blur(8px)";
+            uiFrame.style.webkitFilter = "blur(8px)";
+        };
+
+        const _clearCanvasFilter = Graphics._clearCanvasFilter;
+        Graphics._clearCanvasFilter = function() {
+            _clearCanvasFilter.apply(this, arguments);
+
+            uiFrame.style.opacity = 1;
+            uiFrame.style.filter = "";
+            uiFrame.style.webkitFilter = "";
+        };
+
+        // Stop error printer from blocking ui events
+        const _createErrorPrinter = Graphics._createErrorPrinter;
+        Graphics._createErrorPrinter = function() {
+            _createErrorPrinter.apply(this, arguments);
+
+            Graphics._errorPrinter.style.pointerEvents = "none";
+        }
+    }
+
+    // Event system for messages to the ui
+    {
+        PluginManager.registerCommand(pluginName, "SendEvent", args => {
+            const eventObject = {
+                name: args.eventName,
+                arguments: args.arguments
+            };
+
+            if (parameters.liveDevelopment === "true") {
+                uiFrame.contentWindow.postMessage(eventObject, parameters.address);
+            } else {
+                uiFrame.contentWindow.postMessage(eventObject);
+            }
+        });
+    }
+
+    // Rip out the ui
+    {
+        Scene_Splash.prototype.gotoTitle = function() {
+            SceneManager.goto(Scene_Blank);
+        };
+
+        Scene_Map.prototype.isMenuEnabled = (() => false);
+
+        // Blank scene
+        function Scene_Blank() {
+            this.initialize(...arguments);
+        }
+
+        Scene_Blank.prototype = Object.create(Scene_Base.prototype);
+        Scene_Blank.prototype.constructor = Scene_Blank;
+    }
+
+    // Hide ui when rpg maker ui is shown
+    {
+        function sentUiMessage(message) {
+            const eventObject = {
+                name: message,
+                arguments: ""
+            };
+
+            if (parameters.liveDevelopment === "true") {
+                uiFrame.contentWindow.postMessage(eventObject, parameters.address);
+            } else {
+                uiFrame.contentWindow.postMessage(eventObject);
+            }
+        }
+        const _goto = SceneManager.goto;
+        SceneManager.goto = function() {
+            _goto.apply(this, arguments);
+
+            if(arguments[0].name === "Scene_Title") {
+                sentUiMessage("menu");
+                return;
+            }
+
+            if(["Scene_Battle", "Scene_Shop", "Scene_Gameover"].contains(arguments[0].name)) {
+                sentUiMessage("hideUi");
+                return;
+            }
+
+            if(arguments[0].name === "Scene_Map") {
+                sentUiMessage("showUi");
+            }
+        }
+    }
 })();
